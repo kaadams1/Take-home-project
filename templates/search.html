@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Select a date{% endblock %}
+
+{% block body %}
+
+    <h1>Make your dinner reservation:</h1>
+
+    <div id='calendar'></div>
+
+    <div id="date-select">
+        <form method="post" action="/schedule">
+            <input type="date" name="date" id="date" required>
+            <a class="btn btn-primary" type="submit" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">Choose this date</a>
+        
+
+        <div class="collapse" id="collapseExample">
+            <div class="card card-body">
+                <div>Choose a time:</div>
+
+                    {% for time in time_list %}
+                        <input type="hidden" name="value" value="{{ time }}">
+                        <ul><button class="btn btn-primary" name="time" id="time" type="time">{{ time }}</button></ul>
+                    {% endfor %}
+                
+                </div>
+            </div>
+        </div>
+        </form>
+    </div>
+
+
+
+<!-- CALENDAR -->
+<script>
+        document.addEventListener('DOMContentLoaded', function() {
+          var calendarEl = document.getElementById('calendar');
+          var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            // slotDuration: '00:30',
+            // slotMinTime: '8:00',
+            // slotMaxTime: '22:00',
+            // allDaySlot: false,
+            // themeSystem: 'bootstrap',
+            selectable: true,
+            height: 500,
+            aspectRatio: 1.2,
+            handleWindowResize: true
+          });
+          calendar.render();
+        });
+</script>
+
+
+
+{% endblock %}

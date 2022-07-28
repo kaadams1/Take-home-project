@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Your home page:{% endblock %}
+
+{% block body %}
+
+<h1>Your reservations:</h1>
+
+<div>
+    {% for reservation in reservation_list %}
+        <ul>{{ reservation.reservation_time }}</ul>
+    {% endfor %}
+</div>
+
+<div>
+    <a class="button" href="/search">Make a reservation</a>
+</div>
+
+<div>
+    <a class="button" href="/logout">Logout</a>
+</div>
+
+{% endblock %}
