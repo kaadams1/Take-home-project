@@ -6,13 +6,13 @@
 
 <h1>Your reservations:</h1>
 
-{% if reservation_list %}
 <div>
+{% if (reservation_list is defined) and reservation_list %}
     {% for reservation in reservation_list %}
         <ul>{{ reservation.reservation_date.strftime('%a %m/%d') }} {{reservation.reservation_time.strftime("%I:%M %p") }}</ul>
     {% endfor %}
-</div>
 {% endif %}
+</div>
 
 <div>
     <a class="button" href="/search">Make a reservation</a>

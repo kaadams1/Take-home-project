@@ -65,8 +65,7 @@ def view_user():
         user = User.get_by_email(session["user_email"])
         user_id = user.user_id
 
-        reservation_list = Reservation.query.filter(Reservation.user_id==user_id)
-
+        reservation_list = Reservation.query.filter(Reservation.user_id == user.user_id).all()
 
     else:
         flash("Please log in!")
@@ -93,7 +92,7 @@ def search():
     min_gap = 30
 
     time_list = [(start + timedelta(hours=min_gap*i/60)).strftime("%I:%M %p")
-       for i in range(int((end-start).total_seconds() / 60.0 / min_gap))]
+       for i in range(int((end-start).total_seconds() / 60.0 / min_gap))] #list of strings
 
     user = User.get_by_email(session["user_email"])
     user_id = user.user_id
@@ -101,9 +100,14 @@ def search():
 
     reservation_time_list = []
     for reservation in reservation_list:
-        reservation_time_list.append(str(reservation.reservation_time))
+        time_to_format = reservation.reservation_time
+        formatted_time = time_to_format.strftime("%I:%M %p")
+        reservation_time_list.append(formatted_time)
 
-    #if reservation_time in time_list, need to pop it out
+    #if reservation_time in time_list, need to remove it
+    for reservation_time in reservation_time_list:
+        if reservation_time in time_list:
+            time_list.remove(reservation_time)
 
     return render_template("search.html", time_list=time_list)
     
@@ -131,15 +135,15 @@ def search_times():
         reservation_time = datetime.strptime(chosen_time, '%I:%M %p')
 
         if chosen_date in reservation_date_list:
-            flash("You cannot schedule multiple reservations for the same day!")
+            flash("You already have a reservation on that day!")
+            return redirect('/search')
 
         else:
             scheduled_reservation = Reservation.create(user.user_id, reservation_date, reservation_time)
             db.session.add(scheduled_reservation)
             db.session.commit()
             flash("Success! Your reservation has been made.")
-
-    return redirect("/view")
+            return redirect("/view")
 
 
 if __name__ == "__main__":
