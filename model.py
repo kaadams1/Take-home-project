@@ -40,8 +40,9 @@ class Reservation(db.Model):
     __tablename__ = "reservations"
 
     reservation_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.user_id"))    
-    reservation_time = db.Column(db.String, unique=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.user_id"))   
+    reservation_date = db.Column(db.Date, unique=False) 
+    reservation_time = db.Column(db.Time, unique=False)
 
     user = db.relationship("User", backref="reservations")    
 
@@ -49,9 +50,9 @@ class Reservation(db.Model):
         return f"<Reservation reservation_id={self.reservation_id} reservation_time={self.reservation_time}>"
 
     @classmethod
-    def create(cls, user_id, reservation_time):
+    def create(cls, user_id, reservation_date, reservation_time):
        """Create and return a new reservation."""
-       return cls(user_id=user_id, reservation_time=reservation_time)
+       return cls(user_id=user_id, reservation_date=reservation_date, reservation_time=reservation_time)
 
     @classmethod
     def get_by_id(cls, reservation_id):

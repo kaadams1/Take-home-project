@@ -67,6 +67,7 @@ def view_user():
 
         reservation_list = Reservation.query.filter(Reservation.user_id==user_id)
 
+
     else:
         flash("Please log in!")
         return redirect("/")
@@ -94,6 +95,16 @@ def search():
     time_list = [(start + timedelta(hours=min_gap*i/60)).strftime("%I:%M %p")
        for i in range(int((end-start).total_seconds() / 60.0 / min_gap))]
 
+    user = User.get_by_email(session["user_email"])
+    user_id = user.user_id
+    reservation_list = Reservation.query.filter(Reservation.user_id==user_id)
+
+    reservation_time_list = []
+    for reservation in reservation_list:
+        reservation_time_list.append(str(reservation.reservation_time))
+
+    #if reservation_time in time_list, need to pop it out
+
     return render_template("search.html", time_list=time_list)
     
 
@@ -106,15 +117,27 @@ def search_times():
 
     else:
         user = User.get_by_email(session["user_email"])
+        user_id = user.user_id
+        reservation_list = Reservation.query.filter(Reservation.user_id==user_id)
+        
+        reservation_date_list = []
+
+        for reservation in reservation_list:
+            reservation_date_list.append(str(reservation.reservation_date))
+
         chosen_date = request.form.get("date")
         chosen_time = request.form.get("value")
-        datetime_str = str(chosen_date) + ' ' + str(chosen_time)
-        # datetime_obj = datetime.strptime(datetime_str, '%Y/%m/%d %H:%M %p')
-        scheduled_reservation = Reservation.create(user.user_id, datetime_str)
-        db.session.add(scheduled_reservation)
-        db.session.commit()
+        reservation_date = datetime.strptime(chosen_date, '%Y-%m-%d')
+        reservation_time = datetime.strptime(chosen_time, '%I:%M %p')
 
-        flash("Success! Your reservation has been made.")
+        if chosen_date in reservation_date_list:
+            flash("You cannot schedule multiple reservations for the same day!")
+
+        else:
+            scheduled_reservation = Reservation.create(user.user_id, reservation_date, reservation_time)
+            db.session.add(scheduled_reservation)
+            db.session.commit()
+            flash("Success! Your reservation has been made.")
 
     return redirect("/view")
 
